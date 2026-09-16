@@ -34,34 +34,52 @@ escalabilidad y eficiencia de costes**.
 ## 2. Principales Modelos
 
 ### 1. Modelo Silo
+
 Cada tenant tiene su propia infraestructura aislada:su base de datos, a veces su propio contenedor, su propia stack.
 
 #### A favor:
+
 - Aislamiento brutal. Un tenant no puede ni por accidente ver los datos de otro.
 - Fácil de cumplir requisitos regulatorios estrictos.
 - Un cliente pesado no afecta el rendimiento de los demás ("noisy neighbor").
+
 #### En contra:
+
 - Tu factura crece linealmente con cada cliente. 100 clientes = 100 bases de datos que pagar.
 - Desplegar un cambio significa actualizarlo en N stacks.
 
 ---
+
 ### 2. Modelo POOL
-Todos los tenants comparten la misma base de datos y la misma infraestructura. La separación es lógica, normalmente con una columna ```tenant_id``` en cada tabla.
+
+Todos los tenants comparten la misma base de datos y la misma infraestructura. La separación es lógica, normalmente con una columna `tenant_id` en cada tabla.
 
 #### A favor:
+
 - Costo eficientísimo. Escalas a cientos de clientes sin multiplicar infraestructura.
 - Un solo despliegue actualiza a todo el mundo.
+
 #### En contra:
-- El aislamiento depende 100% de tu código. Si a alguien se le olvida un ``WHERE tenant_id``, acabas de filtrar los datos de un cliente a otro. Es el bug más caro que existe en un SaaS.
+
+- El aislamiento depende 100% de tu código. Si a alguien se le olvida un `WHERE tenant_id`, acabas de filtrar los datos de un cliente a otro. Es el bug más caro que existe en un SaaS.
 - El "noisy neighbor" es real: un cliente con millones de registros puede ralentizar a todos.
 
+---
+
 ### 3. Modelo Bridge
+
 El híbrido: infraestructura compartida, pero datos separados por esquema o por base de datos dentro del mismo servidor.
+
 #### A favor:
+
 - Mejor aislamiento que Pool, más barato que Silo.
 - Puedes hacer backup o migrar un solo tenant sin tocar a los demás.
+
 #### En contra:
+
 - La complejidad operativa. Las migraciones de esquema se vuelven un baile: tienes que correr cada migration contra N esquemas y rezar para que ninguno falle a la mitad.
+
+---
 
 ## 4. Principales problemas de seguridad
 
@@ -161,15 +179,24 @@ Tenant C ─┘
 ## 7. Consideraciones para Elegir una Arquitectura
 
 ### 1. Requisitos de aislamiento y seguridad:
+
 ¿Que nivel de separacion necesitan los datos?
+
 ### 2. Regulaciones y cumplimiento:
+
 ¿Que normativas deben de cumplirse?
+
 ### 3. Necesidades de personalización:
+
 ¿Cuanta adaptabilidad requiere cada inquilino?
+
 ### 4. Escala Esperada:
+
 ¿Cuantos inquilinos planea soportar y con que crecimiento?
+
 ### 5. Presupuesto disponible:
-¿Que recursos financieros tienes para la infraestructura? 
+
+¿Que recursos financieros tienes para la infraestructura?
 
 ---
 
@@ -181,5 +208,3 @@ escalables**, pero introduce dos grandes retos:
 **1. Aislar correctamente los datos.**\
 **2. Evitar que un tenant perjudique al resto mediante un consumo
 excesivo de recursos.**
-
-
