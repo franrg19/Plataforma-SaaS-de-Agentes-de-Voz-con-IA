@@ -67,7 +67,17 @@ El ciclo de interacción sigue un flujo optimizado para mantener una latencia co
 - Almacenamiento y consulta de transcripciones completas de llamadas.
 - Registro de métricas operativas (duración de llamadas, tasas de resolución, latencia media).
 
-## 5. Próximos Hitos de Desarrollo
+## 5. Mi propuesta
+
+Para el SaaS de agentes de voz con IA, mi propuesta es utilizar un modelo multi-tenant con base de datos y schema compartidos, utilizando tenant_id en las tablas y RLS en PostgreSQL para aislar los datos de cada cliente.
+
+La principal razón es que, si vamos a tener muchos clientes, crear una base de datos independiente para cada uno desde el principio aumentaría la complejidad de mantenimiento, migraciones, backups y despliegues. Con un modelo compartido, todos utilizan la misma estructura, pero cada registro pertenece a un tenant_id, y RLS garantiza que un cliente no pueda acceder a los datos de otro.
+
+A nivel de seguridad, lo combinaría con JWT y RBAC. El JWT identifica al usuario, su tenant y su rol; RBAC controla qué acciones puede realizar según su rol, mientras que RLS garantiza el aislamiento de los datos. De esta forma, FastAPI gestiona la autenticación y autorización, y PostgreSQL añade una segunda capa de seguridad.
+Además, dejaría la arquitectura preparada para que, en el futuro, un cliente Enterprise que necesite un mayor nivel de aislamiento pueda utilizar una base de datos dedicada.
+Con este enfoque buscamos un equilibrio entre seguridad, escalabilidad y facilidad de mantenimiento, manteniendo la posibilidad de adaptar el nivel de aislamiento según las necesidades de cada cliente.
+
+## 6. Próximos Hitos de Desarrollo
 
 - **Fase 1:** Definición del esquema de datos multi-tenant en Supabase y configuración de políticas RLS.
 - **Fase 2:** Implementación del backend en FastAPI y configuración de webhooks de integración con Vapi.
